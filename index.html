@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Déficit: calorías y proteína</title>
+<meta name="apple-mobile-web-app-capable" content="yes"><meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Déficit"><meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#0E7C86">
+<link rel="apple-touch-icon" href="icon-180.png"><link rel="manifest" href="manifest.webmanifest">
+
+
+<style>
+:root{--bg:#EAF0EE;--card:#fff;--ink:#12262B;--mute:#566C70;--line:#D3DEDB;--a:#0E7C86;--p:#4B45C8;--c:#E3A21A;--f:#D9486B;--on:#fff;--warn:#FFF1CC;--warnt:#5E4200;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0E1A1D;--card:#152327;--ink:#E4F0EE;--mute:#8FA6A8;--line:#26393D;--a:#35B7C2;--p:#9B96FF;--c:#F0B84A;--f:#F0768F;--on:#06191C;--warn:#3A2F10;--warnt:#F5D88A;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0E1A1D;--card:#152327;--ink:#E4F0EE;--mute:#8FA6A8;--line:#26393D;--a:#35B7C2;--p:#9B96FF;--c:#F0B84A;--f:#F0768F;--on:#06191C;--warn:#3A2F10;--warnt:#F5D88A;color-scheme:dark}
+*{box-sizing:border-box}html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.w{max-width:640px;margin:0 auto;padding:20px 16px 110px}
+h1,h2,.num,nav button{font-family:ui-rounded,system-ui,sans-serif}
+h1{font-size:28px;margin:4px 0 2px;letter-spacing:-.02em}
+h2{font-size:17px;margin:0 0 10px}
+.sub{color:var(--mute);margin:0 0 18px}
+section{display:none}section.on{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px}
+.warn{background:var(--warn);color:var(--warnt);border-color:transparent;font-size:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+label{display:block;font-size:13px;color:var(--mute)}
+input,select{width:100%;margin-top:3px;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--bg);color:var(--ink);font:inherit}
+:focus-visible{outline:2px solid var(--a);outline-offset:2px}
+.btn{margin-top:12px;width:100%;padding:12px;border:0;border-radius:10px;background:var(--a);color:var(--on);font:700 15px ui-rounded,system-ui,sans-serif;cursor:pointer}
+.big{font-size:46px;font-weight:800;line-height:1.05;letter-spacing:-.03em}
+.mute{color:var(--mute);font-size:14px}
+.bar{display:flex;height:14px;border-radius:7px;overflow:hidden;background:var(--line);margin:8px 0}
+.bar i{display:block;height:100%}
+.row{display:flex;justify-content:space-between;gap:10px;align-items:center}
+.dot{display:inline-block;width:10px;height:10px;border-radius:50%;margin-right:6px}
+.pro{border:2px solid var(--p)}
+.pro .big{color:var(--p)}
+table{width:100%;border-collapse:collapse;font-size:14px}
+td{padding:6px 0;border-top:1px solid var(--line)}td:last-child{text-align:right;font-weight:600;white-space:nowrap}
+ul{list-style:none;margin:0;padding:0}
+li.it{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:8px 0;border-top:1px solid var(--line);font-size:15px}
+.x{background:none;border:0;color:var(--mute);font-size:20px;cursor:pointer;padding:2px 8px}
+.chk{display:flex;gap:10px;align-items:center;font-size:15px;color:var(--ink);padding:6px 0}
+.chk input{width:20px;height:20px;margin:0}
+details{border-top:1px solid var(--line);padding:10px 0}details:first-of-type{border-top:0}
+summary{cursor:pointer;font-weight:600}
+details p{margin:8px 0 0;color:var(--mute);font-size:15px}
+nav{position:fixed;left:0;right:0;bottom:0;display:flex;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+nav button{flex:1;padding:14px 4px;background:none;border:0;color:var(--mute);font-size:14px;font-weight:700;cursor:pointer}
+nav button[aria-current=page]{color:var(--a);box-shadow:inset 0 3px 0 var(--a)}
+svg{display:block;max-width:100%}
+</style>
+</head>
+<body>
+<div class="w">
+<h1>Déficit</h1>
+<p class="sub">Calorías, macros y proteína para definir sin perder músculo.</p>
+
+<section id="plan" class="on">
+<div class="card"><h2>Tus datos</h2>
+<div class="grid">
+<label>Sexo<select id="sex"><option value="h">Hombre</option><option value="m">Mujer</option></select></label>
+<label>Edad<input id="age" type="number" inputmode="numeric" min="18" max="80"></label>
+<label>Altura (cm)<input id="h" type="number" inputmode="numeric"></label>
+<label>Peso actual (kg)<input id="w" type="number" step="0.1" inputmode="decimal"></label>
+<label>Peso objetivo (kg)<input id="goal" type="number" step="0.1" inputmode="decimal"></label>
+<label>% grasa (opcional)<input id="bf" type="number" step="0.1" inputmode="decimal" placeholder="Si lo sabes"></label>
+</div>
+<label style="margin-top:10px">Actividad<select id="act">
+<option value="1.2">Sedentaria: poco ejercicio</option>
+<option value="1.375">Ligera: 1–3 días de ejercicio</option>
+<option value="1.55">Moderada: 3–5 días</option>
+<option value="1.725">Alta: 6–7 días</option>
+<option value="1.9">Muy alta: entreno intenso y trabajo físico</option></select></label>
+<div class="grid" style="margin-top:10px">
+<label>Ritmo<select id="pace"><option value="0.15">Suave (−15 %)</option><option value="0.2">Moderado (−20 %)</option><option value="0.25">Rápido (−25 %)</option></select></label>
+<label>Comidas al día<select id="meals"><option>3</option><option>4</option><option>5</option></select></label>
+</div></div>
+<div id="res"></div>
+</section>
+
+<section id="hoy"><div id="tb"></div></section>
+<section id="peso"><div id="wb"></div></section>
+
+<section id="guia">
+<div class="card"><h2>Cómo hacerlo bien</h2>
+<details open><summary>Qué es un déficit</summary><p>Comer algo menos de lo que gastas. Unas 7.700 kcal equivalen a 1 kg de grasa, aunque es una aproximación. Un déficit del 15–25 % se sostiene; uno mayor suele costar músculo, energía y adherencia.</p></details>
+<details><summary>Entrena fuerza</summary><p>La proteína ayuda, pero el estímulo que le dice al cuerpo que conserve el músculo es el entrenamiento de fuerza. Haz 3–4 sesiones por semana e intenta mantener o subir tus cargas.</p></details>
+<details><summary>Reparte la proteína</summary><p>Apunta a 25–40 g en cada comida principal. Es más fácil cumplir el total y también ayuda a controlar el hambre.</p></details>
+<details><summary>Pésate con cabeza</summary><p>Pésate a la misma hora, mejor en ayunas, y mira la media semanal, no el dato de un día. El peso fluctúa por agua, sal y digestión. Mide también la cintura una vez por semana.</p></details>
+<details><summary>Cuándo ajustar</summary><p>Si tras 2 semanas no hay cambio, baja unas 100–150 kcal o suma unos 2.000 pasos diarios. Si pierdes más del 1 % de tu peso por semana, sube calorías.</p></details>
+<details><summary>Descansos de dieta</summary><p>Tras 8–12 semanas, 1–2 semanas a calorías de mantenimiento ayudan a recuperar energía y adherencia.</p></details>
+<details><summary>Sueño, pasos y alcohol</summary><p>Dormir 7–9 horas regula el hambre. Caminar 8.000–10.000 pasos suma gasto sin fatigar. El alcohol aporta 7 kcal por gramo y se olvida al registrar.</p></details>
+<details><summary>Comida real y saciante</summary><p>Basa el plan en proteína magra, verduras, legumbres, fruta y cereales integrales. Deja un margen del 10–20 % para comidas flexibles: la constancia gana a la perfección.</p></details>
+</div>
+<div class="card warn"><b>Importante.</b> Los cálculos son estimaciones orientativas (fórmula Mifflin-St Jeor) y no sustituyen a un médico o dietista. Esta app es para adultos sanos. No la uses si estás embarazada o en lactancia, tienes diabetes u otra enfermedad, tomas medicación o has tenido un trastorno de la conducta alimentaria. Si la comida o el peso te generan ansiedad, pide ayuda profesional.</div>
+</section>
+</div>
+
+<nav>
+<button data-t="plan">Plan</button><button data-t="hoy">Hoy</button><button data-t="peso">Peso</button><button data-t="guia">Guía</button>
+</nav>
+
+<script>
+const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
+let st;try{localStorage.setItem('_t','1');localStorage.removeItem('_t');st=localStorage}catch(e){const m={};st={getItem:k=>m[k]??null,setItem:(k,v)=>{m[k]=v}}}
+const ld=(k,d)=>{try{const v=st.getItem(k);return v?JSON.parse(v):d}catch(e){return d}};
+const sv=(k,v)=>{try{st.setItem(k,JSON.stringify(v))}catch(e){}};
+const DEF={sex:'h',age:30,h:175,w:85,goal:78,act:'1.55',pace:'0.2',bf:'',meals:'4'};
+let P=Object.assign({},DEF,ld('df-p',{})),LOG=ld('df-l',{}),WT=ld('df-w',[]),CK=ld('df-c',{});
+const td=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt=n=>Math.round(n).toLocaleString('es-ES');
+const d1=n=>n.toFixed(1).replace('.',',');
+
+function calc(p){
+ const age=+p.age,h=+p.h,w=+p.w,goal=+p.goal,bf=+p.bf,act=+p.act,pace=+p.pace,meals=+p.meals;
+ if(!(age>=18&&age<=80&&h>=120&&h<=230&&w>=35&&w<=250))return null;
+ const bmr=10*w+6.25*h-5*age+(p.sex==='h'?5:-161),tdee=bmr*act,floor=p.sex==='h'?1500:1200;
+ let k=tdee*(1-pace),clamped=false;
+ if(k<floor){k=floor;clamped=true}
+ k=Math.round(k/10)*10;
+ const def=Math.max(0,Math.round(tdee-k)),rate=def*7/7700;
+ const useBf=bf>=5&&bf<=55;
+ let lo,rec,hi,ref;
+ if(useBf){ref=w*(1-bf/100);lo=2.3*ref;rec=2.6*ref;hi=3.1*ref}
+ else{ref=Math.min(w,27*(h/100)**2);lo=1.8*ref;rec=2.2*ref;hi=2.4*ref}
+ const pro=Math.round(rec),fat=Math.round(Math.max(.25*k/9,.6*ref));
+ const carb=Math.max(0,Math.round((k-pro*4-fat*9)/4));
+ const lose=Math.max(0,w-goal),weeks=rate>0?Math.ceil(lose/rate):0;
+ return{tdee,k,def,rate,clamped,lo:Math.round(lo),pro,hi:Math.round(hi),fat,carb,lose,weeks,useBf,ref,w,h,goal,floor,meals,pm:Math.round(pro/meals)};
+}
+
+function renderPlan(){
+ const t=calc(P),el=$('#res');
+ if(!t){el.innerHTML='<div class="card warn">Revisa los datos: la app es para adultos de 18 a 80 años con altura y peso realistas.</div>';return}
+ const gb=t.goal/((t.h/100)**2),wn=[];
+ if(t.clamped)wn.push(`Por seguridad, el objetivo no baja de ${fmt(t.floor)} kcal, así que tu déficit real es menor que el ritmo elegido.`);
+ if(t.goal>0&&gb<18.5)wn.push(`Un peso objetivo de ${d1(t.goal)} kg te dejaría con un IMC de ${d1(gb)}, por debajo del rango saludable.`);
+ if(t.lose<=0)wn.push('Tu peso objetivo no es menor que el actual. Puedes usar estos números como referencia, pero no hace falta déficit para llegar a él.');
+ const mk=[['Proteína',t.pro,4,'var(--p)'],['Carbohidratos',t.carb,4,'var(--c)'],['Grasas',t.fat,9,'var(--f)']];
+ const tot=mk.reduce((a,x)=>a+x[1]*x[2],0)||1;
+ const fd=[['Pechuga de pollo cocinada, 100 g','31 g'],['Merluza o bacalao, 150 g','25 g'],['Atún al natural, 1 lata','13 g'],['Huevo, 1 unidad','6 g'],['Yogur griego 0 %, 170 g','17 g'],['Queso fresco batido 0 %, 100 g','8 g'],['Lentejas cocidas, 100 g','8 g'],['Proteína whey, 1 scoop (30 g)','24 g']];
+ const basis=t.useBf?`Calculado sobre tu masa magra (${d1(t.ref)} kg), unos 2,6 g por kg.`:(t.ref<t.w?`Calculado sobre un peso de referencia de ${d1(t.ref)} kg para no pasarte con el sobrepeso.`:`Unos ${d1(t.pro/t.w)} g por kg de tu peso.`);
+ el.innerHTML=`${wn.map(x=>`<div class="card warn">${x}</div>`).join('')}
+<div class="card"><div class="mute">Tu objetivo diario</div><div class="big num">${fmt(t.k)} <span class="mute">kcal</span></div>
+<p class="mute" style="margin:8px 0 0">Mantenimiento estimado: ${fmt(t.tdee)} kcal. Déficit de ${fmt(t.def)} kcal al día, unos ${d1(t.rate)} kg por semana.${t.weeks>0?` Llegarías a ${d1(t.goal)} kg en unas ${t.weeks} semanas (hacia ${new Date(Date.now()+t.weeks*6048e5).toLocaleDateString('es-ES',{month:'long',year:'numeric'})}), una estimación que se alarga al ir bajando de peso.`:''}</p></div>
+<div class="card pro"><div class="mute">Proteína al día</div><div class="big num">${t.pro} <span class="mute">g</span></div>
+<p class="mute" style="margin:8px 0 0">Rango útil: ${t.lo}–${t.hi} g. ${basis} En déficit conviene subirla respecto al mantenimiento: ayuda a conservar músculo y a saciarte.</p>
+<p style="margin:10px 0 4px"><b>${t.meals} comidas: unos ${t.pm} g por comida.</b></p>
+<table>${fd.map(f=>`<tr><td>${f[0]}</td><td>≈ ${f[1]}</td></tr>`).join('')}</table></div>
+<div class="card"><h2>Reparto de macros</h2><div class="bar">${mk.map(x=>`<i style="width:${x[1]*x[2]/tot*100}%;background:${x[3]}"></i>`).join('')}</div>
+${mk.map(x=>`<div class="row" style="padding:3px 0"><span><span class="dot" style="background:${x[3]}"></span>${x[0]}</span><span><b>${x[1]} g</b> <span class="mute">· ${fmt(x[1]*x[2])} kcal</span></span></div>`).join('')}</div>
+<div class="card"><h2>Otros objetivos diarios</h2>
+<div class="row" style="padding:3px 0"><span>Agua</span><b>${d1(t.w*.035)} L</b></div>
+<div class="row" style="padding:3px 0"><span>Fibra</span><b>${Math.round(14*t.k/1000)} g</b></div>
+<div class="row" style="padding:3px 0"><span>Pasos</span><b>8.000–10.000</b></div>
+<div class="row" style="padding:3px 0"><span>Sueño</span><b>7–9 h</b></div></div>`;
+}
+
+function renderToday(){
+ const t=calc(P),el=$('#tb');
+ if(!t){el.innerHTML='<div class="card">Completa tus datos en la pestaña Plan para ver tu día.</div>';return}
+ const it=LOG[td()]||[],kc=it.reduce((a,x)=>a+x.k,0),pr=it.reduce((a,x)=>a+x.p,0),left=t.k-kc,ck=CK[td()]||{};
+ const pc=(v,m)=>Math.min(100,Math.max(0,v/m*100));
+ const cks=[['agua',`Agua: ${d1(t.w*.035)} L`],['pasos','Pasos: 8.000 o más'],['fuerza','Entreno de fuerza'],['sueno','Dormir 7 h o más']];
+ el.innerHTML=`<div class="card"><div class="mute">${left>=0?'Te quedan hoy':'Te has pasado hoy'}</div><div class="big num">${fmt(Math.abs(left))} <span class="mute">kcal</span></div>
+<div class="bar"><i style="width:${pc(kc,t.k)}%;background:var(--a)"></i></div><div class="mute">${fmt(kc)} de ${fmt(t.k)} kcal</div>
+<div class="row" style="margin-top:14px"><b>Proteína</b><span><b>${Math.round(pr)}</b> de ${t.pro} g</span></div>
+<div class="bar"><i style="width:${pc(pr,t.pro)}%;background:var(--p)"></i></div>
+<div class="mute">${pr>=t.pro?'Objetivo de proteína cumplido.':`Te faltan ${Math.round(t.pro-pr)} g de proteína.`}</div></div>
+<div class="card"><h2>Añadir comida</h2><div class="grid">
+<label style="grid-column:1/-1">Alimento<input id="fn" placeholder="Ej. pollo con arroz"></label>
+<label>Calorías (kcal)<input id="fk" type="number" inputmode="numeric" min="0"></label>
+<label>Proteína (g)<input id="fp" type="number" inputmode="decimal" min="0"></label></div>
+<button class="btn" id="add">Añadir</button>
+${it.length?`<ul style="margin-top:12px">${it.map((x,i)=>`<li class="it"><span>${esc(x.n)}<br><span class="mute">${fmt(x.k)} kcal · ${Math.round(x.p)} g proteína</span></span><button class="x" data-i="${i}" aria-label="Eliminar ${esc(x.n)}">×</button></li>`).join('')}</ul>`:''}</div>
+<div class="card"><h2>Hábitos de hoy</h2>${cks.map(c=>`<label class="chk"><input type="checkbox" data-c="${c[0]}" ${ck[c[0]]?'checked':''}>${c[1]}</label>`).join('')}</div>`;
+}
+
+function chart(W){
+ const g=+P.goal,vs=W.map(x=>x.v).concat(g>0?[g]:[]),mn=Math.min(...vs)-1,mx=Math.max(...vs)+1;
+ const t0=new Date(W[0].d).getTime(),sp=Math.max(new Date(W[W.length-1].d).getTime()-t0,1);
+ const X=d=>20+(new Date(d).getTime()-t0)/sp*280,Y=v=>12+(mx-v)/(mx-mn)*96;
+ return `<div class="card"><h2>Evolución</h2><svg viewBox="0 0 320 125" role="img" aria-label="Gráfica de peso">
+${g>0?`<line x1="20" x2="300" y1="${Y(g)}" y2="${Y(g)}" stroke="var(--c)" stroke-dasharray="4 4"/><text x="22" y="${Y(g)-4}" font-size="10" fill="var(--mute)">Objetivo ${d1(g)} kg</text>`:''}
+<polyline points="${W.map(x=>X(x.d).toFixed(1)+','+Y(x.v).toFixed(1)).join(' ')}" fill="none" stroke="var(--a)" stroke-width="2.5" stroke-linejoin="round"/>
+${W.map(x=>`<circle cx="${X(x.d).toFixed(1)}" cy="${Y(x.v).toFixed(1)}" r="3.5" fill="var(--a)"/>`).join('')}
+<text x="20" y="123" font-size="10" fill="var(--mute)">${W[0].d.slice(5).split('-').reverse().join('/')}</text>
+<text x="300" y="123" font-size="10" text-anchor="end" fill="var(--mute)">${W[W.length-1].d.slice(5).split('-').reverse().join('/')}</text></svg></div>`;
+}
+
+function analysis(W){
+ if(W.length<2)return '<div class="card mute">Registra tu peso al menos dos veces, con una semana de margen, para ver tu ritmo real.</div>';
+ const D=864e5,L=W[W.length-1],lt=new Date(L.d).getTime(),avg=a=>a.reduce((s,x)=>s+x.v,0)/a.length;
+ const a1=W.filter(x=>lt-new Date(x.d).getTime()<7*D),a2=W.filter(x=>{const q=lt-new Date(x.d).getTime();return q>=7*D&&q<14*D});
+ let ch=null;
+ if(a1.length&&a2.length)ch=avg(a1)-avg(a2);
+ else{const days=(lt-new Date(W[0].d).getTime())/D;if(days>=7)ch=(L.v-W[0].v)/days*7}
+ const tot=L.v-W[0].v,left=L.v-(+P.goal);
+ let msg='Necesito al menos una semana de datos para valorar tu ritmo.';
+ if(ch!==null){const pc=ch/L.v*100;
+  msg=pc<-1?`Pierdes ${d1(Math.abs(ch))} kg por semana (${d1(Math.abs(pc))} %), más rápido de lo recomendable. Sube unas 150–200 kcal para proteger el músculo.`
+  :pc<=-.25?`Pierdes ${d1(Math.abs(ch))} kg por semana (${d1(Math.abs(pc))} %): un ritmo sólido. Sigue así.`
+  :`Tu peso apenas baja (${ch>0?'+':''}${d1(ch)} kg por semana). Si llevas 2 semanas así, baja 100–150 kcal o suma unos 2.000 pasos diarios.`}
+ return `<div class="card"><h2>Tu ritmo</h2><p style="margin:0 0 8px">${msg}</p><p class="mute" style="margin:0">Cambio total: ${tot>0?'+':''}${d1(tot)} kg.${+P.goal>0&&left>0?` Te faltan ${d1(left)} kg para tu objetivo.`:''}</p></div>`;
+}
+
+function renderWeight(){
+ const W=[...WT].sort((a,b)=>a.d<b.d?-1:1);
+ $('#wb').innerHTML=`<div class="card"><h2>Registrar peso</h2><div class="grid"><label>Fecha<input id="wd" type="date" value="${td()}"></label><label>Peso (kg)<input id="wv" type="number" step="0.1" inputmode="decimal"></label></div><button class="btn" id="wadd">Guardar peso</button></div>
+${W.length>1?chart(W):''}${analysis(W)}
+${W.length?`<div class="card"><h2>Historial</h2><ul>${W.slice().reverse().slice(0,12).map(x=>`<li class="it"><span>${x.d.split('-').reverse().join('/')} · <b>${d1(x.v)} kg</b></span><button class="x" data-d="${x.d}" aria-label="Eliminar registro">×</button></li>`).join('')}</ul></div>`:''}`;
+}
+
+/* eventos */
+['sex','age','h','w','goal','bf','act','pace','meals'].forEach(id=>{
+ const e=$('#'+id);e.value=P[id];
+ e.addEventListener('input',()=>{P[id]=e.value;sv('df-p',P);renderPlan()});
+});
+$('#tb').addEventListener('click',e=>{
+ if(e.target.id==='add'){
+  const n=$('#fn').value.trim(),k=+$('#fk').value,p=+$('#fp').value||0;
+  if(!n||!(k>=0)||$('#fk').value===''){$('#fn').focus();return}
+  (LOG[td()]=LOG[td()]||[]).push({n,k,p});sv('df-l',LOG);renderToday();$('#fn').focus();
+ }else if(e.target.dataset.i){LOG[td()].splice(+e.target.dataset.i,1);sv('df-l',LOG);renderToday()}
+});
+$('#tb').addEventListener('change',e=>{
+ const c=e.target.dataset.c;if(!c)return;
+ CK[td()]=Object.assign(CK[td()]||{},{[c]:e.target.checked});sv('df-c',CK);
+});
+$('#wb').addEventListener('click',e=>{
+ if(e.target.id==='wadd'){
+  const d=$('#wd').value,v=+$('#wv').value;
+  if(!d||!(v>=30&&v<=300)){$('#wv').focus();return}
+  WT=WT.filter(x=>x.d!==d).concat([{d,v}]);sv('df-w',WT);renderWeight();
+ }else if(e.target.dataset.d){WT=WT.filter(x=>x.d!==e.target.dataset.d);sv('df-w',WT);renderWeight()}
+});
+
+const TABS=['plan','hoy','peso','guia'];
+function go(n){
+ if(!TABS.includes(n))n='plan';
+ $$('section').forEach(s=>s.classList.toggle('on',s.id===n));
+ $$('nav button').forEach(b=>b.setAttribute('aria-current',b.dataset.t===n?'page':'false'));
+ if(n==='hoy')renderToday();if(n==='peso')renderWeight();
+ window.scrollTo(0,0);
+}
+$$('nav button').forEach(b=>b.addEventListener('click',()=>{location.hash=b.dataset.t}));
+window.addEventListener('hashchange',()=>go(location.hash.slice(1)));
+renderPlan();go(location.hash.slice(1));
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+</script>
+</body>
+</html>
