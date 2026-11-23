@@ -110,6 +110,7 @@ const ld=(k,d)=>{try{const v=st.getItem(k);return v?JSON.parse(v):d}catch(e){ret
 const sv=(k,v)=>{try{st.setItem(k,JSON.stringify(v))}catch(e){}};
 const DEF={sex:'h',age:30,h:175,w:85,goal:78,act:'1.55',pace:'0.2',bf:'',meals:'4'};
 let P=Object.assign({},DEF,ld('df-p',{})),LOG=ld('df-l',{}),WT=ld('df-w',[]),CK=ld('df-c',{});
+let AK=ld('df-k',''),GK=ld('df-g',''),AM=ld('df-m','gemini-2.5-flash');
 const td=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const fmt=n=>Math.round(n).toLocaleString('es-ES');
@@ -175,9 +176,11 @@ function renderToday(){
 <label style="grid-column:1/-1">Alimento<input id="fn" placeholder="Ej. pollo con arroz"></label>
 <label>Calorías (kcal)<input id="fk" type="number" inputmode="numeric" min="0"></label>
 <label>Proteína (g)<input id="fp" type="number" inputmode="decimal" min="0"></label></div>
+<input id="ff" type="file" accept="image/*" hidden><button class="btn" id="foto" style="background:var(--p)">Estimar con foto</button><div class="mute" id="fs" style="margin-top:8px"></div>
 <button class="btn" id="add">Añadir</button>
 ${it.length?`<ul style="margin-top:12px">${it.map((x,i)=>`<li class="it"><span>${esc(x.n)}<br><span class="mute">${fmt(x.k)} kcal · ${Math.round(x.p)} g proteína</span></span><button class="x" data-i="${i}" aria-label="Eliminar ${esc(x.n)}">×</button></li>`).join('')}</ul>`:''}</div>
-<div class="card"><h2>Hábitos de hoy</h2>${cks.map(c=>`<label class="chk"><input type="checkbox" data-c="${c[0]}" ${ck[c[0]]?'checked':''}>${c[1]}</label>`).join('')}</div>`;
+<div class="card"><h2>Hábitos de hoy</h2>${cks.map(c=>`<label class="chk"><input type="checkbox" data-c="${c[0]}" ${ck[c[0]]?'checked':''}>${c[1]}</label>`).join('')}</div>
+<details class="card" style="border-top:1px solid var(--line)"><summary>Ajustes de la foto</summary><label style="margin-top:10px">Modelo<select id="am">${[['gemini-2.5-flash','Gemini 2.5 Flash: gratis'],['gemini-2.5-flash-lite','Gemini 2.5 Flash-Lite: gratis, más ligero'],['claude-haiku-5-5','Claude Haiku 5.5: de pago'],['claude-sonnet-5-5','Claude Sonnet 5.5: de pago, más preciso']].map(o=>`<option value="${o[0]}" ${AM===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></label><label style="margin-top:8px">Clave de Gemini (gratis)<input id="gk" type="password" autocomplete="off" placeholder="AIza..." value="${esc(GK)}"></label><label style="margin-top:8px">Clave de Anthropic (de pago)<input id="ak" type="password" autocomplete="off" placeholder="sk-ant-..." value="${esc(AK)}"></label><p>Gemini: crea la clave gratis en aistudio.google.com, en Get API key. Anthropic: console.anthropic.com. Solo necesitas la clave del modelo que elijas. Las claves se guardan solo en este teléfono. La foto se envía a Google o a Anthropic para analizarla y hace falta internet.</p></details>`;
 }
 
 function chart(W){
@@ -239,6 +242,28 @@ $('#wb').addEventListener('click',e=>{
  }else if(e.target.dataset.d){WT=WT.filter(x=>x.d!==e.target.dataset.d);sv('df-w',WT);renderWeight()}
 });
 
+function shrink(f){return new Promise((ok,no)=>{const i=new Image(),u=URL.createObjectURL(f);i.onload=()=>{const k=Math.min(1,1024/Math.max(i.width,i.height)),c=document.createElement('canvas');c.width=Math.round(i.width*k);c.height=Math.round(i.height*k);c.getContext('2d').drawImage(i,0,0,c.width,c.height);URL.revokeObjectURL(u);ok(c.toDataURL('image/jpeg',.8).split(',')[1])};i.onerror=()=>no(new Error('No se pudo leer la foto'));i.src=u})}
+async function estimate(f){
+ const s=$('#fs'),b=$('#foto');s.textContent='Analizando la foto…';b.disabled=true;
+ try{
+  const data=await shrink(f),hint=$('#fn').value.trim();
+  const SYS='Eres nutricionista. Estima las calorías y la proteína del plato de la foto, la ración completa tal como se ve. Responde SOLO con JSON, sin texto extra: {"alimento":"nombre corto en español","kcal":numero,"proteina":numero,"nota":"una frase con la ración supuesta"}. Si no hay comida, pon kcal 0.',ASK=hint?'El usuario dice que es: '+hint:'Estima este plato.',g=AM.startsWith('gemini');
+  const r=g?await fetch('https://generativelanguage.googleapis.com/v1beta/models/'+AM+':generateContent?key='+encodeURIComponent(GK),{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({systemInstruction:{parts:[{text:SYS}]},contents:[{parts:[{inline_data:{mime_type:'image/jpeg',data}},{text:ASK}]}],generationConfig:{responseMimeType:'application/json',thinkingConfig:{thinkingBudget:0}}})})
+   :await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':AK,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:AM,max_tokens:400,system:SYS,messages:[{role:'user',content:[{type:'image',source:{type:'base64',media_type:'image/jpeg',data}},{type:'text',text:ASK}]}]})});
+  const j=await r.json();
+  if(!r.ok)throw new Error(j.error&&j.error.message||'Error '+r.status);
+  const tx=g?((j.candidates||[])[0]?.content?.parts||[]).map(x=>x.text||'').join(''):(j.content||[]).map(x=>x.text||'').join('');
+  const m=tx.match(/\{[\s\S]*\}/);
+  if(!m)throw new Error('Respuesta no válida');
+  const o=JSON.parse(m[0]);
+  if(!(o.kcal>0)){s.textContent='No he visto comida en la foto. Prueba con otra.';return}
+  $('#fn').value=o.alimento||hint||'Comida';$('#fk').value=Math.round(o.kcal);$('#fp').value=Math.round(o.proteina||0);
+  s.textContent='Estimación aproximada, puede variar un 20–30 %. '+(o.nota||'')+' Ajusta los números si hace falta y pulsa Añadir.';
+ }catch(e){s.textContent='No se pudo analizar: '+(e.message||'error de conexión')}
+ finally{b.disabled=false;const q=$('#ff');if(q)q.value=''}
+}
+$('#tb').addEventListener('click',e=>{if(e.target.id==='foto'){if(!(AM.startsWith('gemini')?GK:AK)){$('#fs').textContent='Primero pega tu clave de API en Ajustes de la foto, más abajo.';const d=$('#tb details');if(d)d.open=true;return}$('#ff').click()}});
+$('#tb').addEventListener('change',e=>{const t=e.target;if(t.id==='ff'&&t.files[0])estimate(t.files[0]);if(t.id==='gk'){GK=t.value.trim();sv('df-g',GK)}if(t.id==='ak'){AK=t.value.trim();sv('df-k',AK)}if(t.id==='am'){AM=t.value;sv('df-m',AM)}});
 const TABS=['plan','hoy','peso','guia'];
 function go(n){
  if(!TABS.includes(n))n='plan';
